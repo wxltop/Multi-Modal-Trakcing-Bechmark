@@ -1,0 +1,10 @@
+assets/
+models/
+output/
+pretrained/
+results/
+analysis/
+results_for_upload/
+tensorboard/
+toolkit/
+__pycache__/
