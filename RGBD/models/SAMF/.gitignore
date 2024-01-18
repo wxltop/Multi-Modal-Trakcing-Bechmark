@@ -1,0 +1,11 @@
+*.idea
+*~
+*__pycache__*
+*.pyc
+*.pytest_cache
+*.csv
+data/*
+models/*
+checkpoints/*
+tensorboard/*
+test/*

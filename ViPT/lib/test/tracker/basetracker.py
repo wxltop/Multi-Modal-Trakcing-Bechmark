@@ -1,7 +1,7 @@
 import time
 
 import torch
-from _collections import OrderedDict
+from collections import OrderedDict
 
 from lib.train.data.processing_utils import transform_image_to_crop
 from lib.vis.visdom_cus import Visdom

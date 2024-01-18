@@ -38,7 +38,6 @@ class VOT(object):
             channels = ['ir']
         else:
             raise Exception('Illegal configuration {}.'.format(channels))
-
         self._trax = trax.Server([region_format], [trax.Image.PATH], channels, customMetadata=dict(vot="python"))
 
         request = self._trax.wait()

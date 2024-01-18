@@ -1,0 +1,60 @@
+#!/bin/bash
+
+POSITIONAL=()
+
+THREADS=0
+DELAY=0
+MEM="32G"
+#GPUTYPE='titan_xp|geforce_gtx_1080_ti|geforce_rtx_2080_ti|geforce_gtx_titan_x'
+#GPUTYPE='titan_xp|geforce_gtx_1080_ti|geforce_rtx_2080_ti'
+#GPUTYPE='titan_xp|geforce_gtx_1080_ti|geforce_rtx_2080_ti'
+GPUTYPE='titan_xp'
+
+while [[ $# -gt 0 ]]
+do
+    key="$1"
+    case $key in
+        -t|--threads)
+        THREADS=$2
+        shift # past argument
+        shift # past value
+        ;;
+        -d|--delay)
+        DELAY=$2
+        shift # past argument
+        shift # past value
+        ;;
+        *)    # unknown option
+        POSITIONAL+=("$1") # save it in an array for later
+        shift # past argument
+        ;;
+    esac
+done
+
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+echo "sbatch --output=sbatch_logs/%j.out --gres=:1 --constraint="${GPUTYPE}" --mem="${MEM}" job_slurm.sh $1 $2 $THREADS"
+
+if [ $DELAY != 0 ]
+then
+  echo "Sleeping $DELAY before job is submitted ..."
+  sleep $DELAY
+fi
+
+out="$(sbatch --output=sbatch_logs/%j.out --time=24:00:00 --gres=gpu:1 --constraint="${GPUTYPE}" --mem="${MEM}" --cpus-per-task=4 job_slurm.sh $1 $2 $THREADS)"
+#out="$(sbatch --output=sbatch_logs/%j.out --time=24:00:00 --dependency=afterany:165406 --gres=gpu:1 --constraint="${GPUTYPE}" --mem="${MEM}" --cpus-per-task=4 job_slurm.sh $1 $2 $THREADS)"
+#out="$(sbatch --output=sbatch_logs/%j.out --gres=gpu:1 --constraint="${GPUTYPE}" --mem="${MEM}" --exclude=biwirender15  --exclude=biwirender15 --cpus-per-task=4 job_slurm.sh $1 $2 $THREADS)"
+#out="$(sbatch --output=sbatch_logs/%j.out --gres=gpu:1 --constraint="${GPUTYPE}" --mem="${MEM}" --cpus-per-task=4 job_slurm.sh $1 $2 $THREADS)"
+
+stringarray=($out)
+id=${stringarray[3]}
+file="sbatch_logs/${id}.out"
+echo "Waiting for job to start ..."
+
+while [ ! -f $file ]
+do
+  sleep 2
+done
+
+echo "Job started! Reading output file ${file} :"
+tail -f $file

@@ -1,0 +1,1 @@
+vot evaluate --workspace /data/Disk_B/xuefeng/VOT2022/workspace_RGBD Stark

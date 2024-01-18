@@ -46,7 +46,7 @@ def genConfig(seq_path, set_type):
         y_max = np.max(T_gt[:,[1,3]],axis=1)[:,None]
         T_gt = np.concatenate((x_min, y_min, x_max-x_min, y_max-y_min),axis=1)
     
-    elif set_type == 'LasHeR':
+    elif set_type == 'LasHeR' or set_type == 'lasher':
         RGB_img_list = sorted([seq_path + '/visible/' + p for p in os.listdir(seq_path + '/visible') if p.endswith(".jpg")])
         T_img_list = sorted([seq_path + '/infrared/' + p for p in os.listdir(seq_path + '/infrared') if p.endswith(".jpg")])
 
@@ -140,7 +140,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run tracker on RGBT dataset.')
     parser.add_argument('--script_name', type=str, default='prompt', help='Name of tracking method(ostrack, prompt, ftuning).')
     parser.add_argument('--yaml_name', type=str, default='ostrack_ce_ep60_prompt_iv21b_wofovea_8_onlylasher_2xa100_rgbt', help='Name of tracking method.')  # vitb_256_mae_ce_32x4_ep300 vitb_256_mae_ce_32x4_ep60_prompt_i32v21_onlylasher_rgbt
-    parser.add_argument('--dataset_name', type=str, default='LasHeR', help='Name of dataset (GTOT,RGBT234,LasHeR,VTUAVST,VTUAVLT).')
+    parser.add_argument('--dataset_name', type=str, default='lasher', help='Name of dataset (GTOT,RGBT234,LasHeR,VTUAVST,VTUAVLT).')
     parser.add_argument('--threads', default=4, type=int, help='Number of threads')
     parser.add_argument('--num_gpus', default=torch.cuda.device_count(), type=int, help='Number of gpus')
     parser.add_argument('--epoch', default=60, type=int, help='epochs of ckpt')
@@ -162,7 +162,7 @@ if __name__ == '__main__':
         seq_list = [f for f in os.listdir(seq_home) if isdir(join(seq_home,f))]
         seq_list.sort()
     elif dataset_name == 'LasHeR':
-        seq_home = '/media/jiawen/Datasets/Tracking/DATASET/LasHeR/testingset'
+        seq_home = '/home/wangxiaolong/data/vot/lasher/testingset'
         seq_list = [f for f in os.listdir(seq_home) if isdir(join(seq_home,f))]
         seq_list.sort()
     elif dataset_name == 'VTUAVST':

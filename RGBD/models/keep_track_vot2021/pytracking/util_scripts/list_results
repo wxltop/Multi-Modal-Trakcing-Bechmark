@@ -1,0 +1,6 @@
+#/!bin/bash
+
+find /cluster/work/cvl/visobt4/tracking_results -maxdepth 2 -mindepth 2 -type d | sort | while read dir; do
+	printf "%-110.110s : " "$(basename $dir)"
+	find "$dir" -type f ! -name "*time*" | wc -l
+done

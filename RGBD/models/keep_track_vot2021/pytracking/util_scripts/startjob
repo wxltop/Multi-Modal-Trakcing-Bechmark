@@ -1,0 +1,76 @@
+#!/bin/bash
+
+POSITIONAL=()
+
+QUEUE="gpu.48h.q@*"
+THREADS=2
+DELAY=0
+
+while [[ $# -gt 0 ]]
+do
+    key="$1"
+    case $key in
+        -q|--queue)
+        case $2 in
+            2h)
+            QUEUE="gpu.2h.q@*"
+            ;;
+            24h)
+            QUEUE="gpu.24h.q@*"
+            ;;
+            5d)
+            QUEUE="gpu.5d.q@*"
+            ;;
+            pre)
+            QUEUE="gpu.pre.q@*"
+            ;;
+            *)    # unknown option
+            echo "Unknown queue option. Must be 2h,24h or 5d."
+            ;;
+        esac
+        shift # past argument
+        shift # past value
+        ;;
+        -t|--threads)
+        THREADS=$2
+        shift # past argument
+        shift # past value
+        ;;
+        -d|--delay)
+        DELAY=$2
+        shift # past argument
+        shift # past value
+        ;;
+        *)    # unknown option
+        POSITIONAL+=("$1") # save it in an array for later
+        shift # past argument
+        ;;
+    esac
+done
+
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+echo "qsub -o qsub_logs -q "${QUEUE}" -l gpu=1 -l hostname='biwirender1[345689]|bmicgpu0[2-5]' -l h_vmem=40G -j y -cwd  job.sh $1 $2 $THREADS"
+
+if [ $DELAY != 0 ]
+then
+  echo "Sleeping $DELAY before job is submitted ..."
+  sleep $DELAY
+fi
+
+#out="$(qsub -o qsub_logs -q "${QUEUE}" -l gpu=1 -l h_vmem=40G -j y -cwd  job.sh $1 $2 $THREADS)"
+out="$(qsub -o qsub_logs -q "${QUEUE}" -l gpu=1 -l hostname='biwirender1[2345689]|bmicgpu0[2-5]' -l h_vmem=48G -j y -cwd  job.sh $1 $2 $THREADS)"
+
+echo $out
+id=${out:9:7}
+file="qsub_logs/job.sh.o${id}"
+
+echo "Waiting for job to start ..."
+
+while [ ! -f $file ]
+do
+  sleep 2
+done
+
+echo "Job started! Reading output file ${file} :"
+tail -f $file

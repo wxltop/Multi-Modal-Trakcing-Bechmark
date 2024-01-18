@@ -17,7 +17,7 @@ import time
 
 
 def genConfig(seq_path, set_type):
-    if set_type == 'VisEvent':
+    if set_type == 'VisEvent' or set_type == 'visevent':
         RGB_img_list = sorted([seq_path + '/vis_imgs/' + p for p in os.listdir(seq_path + '/vis_imgs') if os.path.splitext(p)[1] == '.bmp'])
         E_img_list = sorted([seq_path + '/event_imgs/' + p for p in os.listdir(seq_path + '/event_imgs') if os.path.splitext(p)[1] == '.bmp'])
 
@@ -107,7 +107,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run tracker on RGBE dataset.')
     parser.add_argument('--script_name', type=str, default='', help='Name of tracking method(ostrack, prompt, ftuning).')
     parser.add_argument('--yaml_name', type=str, default='', help='Name of tracking method.')
-    parser.add_argument('--dataset_name', type=str, default='VisEvent', help='Name of dataset (VisEvent).')
+    parser.add_argument('--dataset_name', type=str, default='visevent', help='Name of dataset (VisEvent).')
     parser.add_argument('--threads', default=4, type=int, help='Number of threads')
     parser.add_argument('--num_gpus', default=torch.cuda.device_count(), type=int, help='Number of gpus')
     parser.add_argument('--epoch', default=60, type=int, help='epochs of ckpt')
@@ -120,14 +120,9 @@ if __name__ == '__main__':
     dataset_name = args.dataset_name
     cur_dir = abspath(dirname(__file__))
     # path initialization
-    seq_list = None
-    if dataset_name == 'VisEvent':
-        seq_home = '/media/jiawen/Datasets/Tracking/DATASET/VisEvent/test'
-        with open(join(seq_home, 'testlist.txt'), 'r') as f:
-            seq_list = f.read().splitlines()
-        seq_list.sort()
-    else:
-        raise ValueError("Error dataset!")
+    seq_home = '/home/wangxiaolong/workspace/projects/Multi-Modal-Trakcing-Bechmark/data/visevent/test_subset'
+    seq_list = os.listdir(seq_home)
+    seq_list = sorted(seq_list)
 
     start = time.time()
     if args.mode == 'parallel':
